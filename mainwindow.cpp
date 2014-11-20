@@ -26,10 +26,10 @@ QStringList* MainWindow::makePassword_N_Character(QStringList *originalList)
             originalList->append(QChar(currentChar));
         }
 
-        for(int i =0;i<originalList->length();i++){
-            qDebug() << "Element " << (33+i) << " : " << originalList->at(i);
-        }
-        qDebug() <<QTextCodec::codecForLocale()->name();
+        //for(long i =0;i<originalList->length();i++){
+        //    qDebug() << "Element " << (33+i) << " : " << originalList->at(i);
+        //}
+        //qDebug() <<QTextCodec::codecForLocale()->name();
 
         return originalList;
     }else{
@@ -90,40 +90,31 @@ void MainWindow::genererListeMotDePasse()
 {
     QString filePath = this->ui->cheminDossier->text() + this->ui->nomFichier->text();
     QFile fichierListeMdp(filePath);
-    //if(fichierListeMdp.exists())
-    //    fichierListeMdp.remove();
+    if(fichierListeMdp.exists())
+        fichierListeMdp.remove();
 
-    /*qDebug() << fichierListeMdp.fileName();
     fichierListeMdp.open(QFile::WriteOnly);
+    //Algorythme de cgénération de mot de passe
     int minimum = this->ui->MinLettres->text().toInt();
     int maximum = this->ui->MaxLettres->text().toInt();
-    for (int i = minimum; i < maximum; ++i) {
-        for (int asciicode=33;asciicode<127; ++asciicode){
+    QTextStream out(&fichierListeMdp);
 
-            qDebug() << QChar::fromLatin1(asciicode);
-            QString ligne; ligne.append(QChar::fromLatin1(asciicode));
-            fichierListeMdp.write(ligne.toLatin1());
-            fichierListeMdp.waitForBytesWritten(100);
-            fichierListeMdp.write("\n");
+    QStringList* passwordList = new QStringList();
+    for(int i=0;i<maximum;i++){
+        this->ui->statusBar->showMessage("Liste n° " + QString::number(i+1));
+        passwordList = this->makePassword_N_Character(passwordList);
 
-        }            qDebug() <<  "Test " << QChar('µ').unicode();
+        if(i>=(minimum-1)){
 
-    }*/
+            for(long j=0;j<passwordList->length();j++){
 
-    //Algorythme de cgénération de mot de passe
+                out <<passwordList->at(j) << "\n";
+            }
+        }
+    }
 
-QStringList* testListe= new QStringList;
-this->makePassword_N_Character(testListe);
-qDebug() << "Begin Liste : ";
-for(int t=0;t<testListe->length();t++)
-    qDebug() << "Element " << t << " : " << testListe->at(t);
-
-testListe = this->makePassword_N_Character(testListe);
-qDebug() << "New Liste : ";
-for(int t=0;t<testListe->length();t++)
-    qDebug() << "Element " << t << " : " << testListe->at(t);
-delete testListe;
+    delete passwordList;
 
     fichierListeMdp.close();
-    this->ui->statusBar->showMessage("Terminé");
+    this->ui->statusBar->showMessage("Terminé",10000);
 }
